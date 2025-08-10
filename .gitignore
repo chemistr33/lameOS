@@ -1,0 +1,14 @@
+# Build output
+build/
+*.o
+*.elf
+*.bin
+*.map
+*.lst
+*.d
+
+# Editor junk
+*~
+*.swp
+.DS_Store
+
