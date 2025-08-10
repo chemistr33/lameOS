@@ -1,0 +1,74 @@
+#######################################################
+################ Serial Physical Notes  ###############
+#######################################################
+
+
+(I) FreeBSD14-3 motherboard USB port (any random port)
+(II) USBA 2.0 <--> μ-USB male
+(III) digilent PmodUARTUSB adapter (blinks a red LED briefly when you connect)
+(IV) Dupont female to female connections
+~~~~~ Pinout Format ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[Pmod pin #, pmod pin fct, wire color, Pine64 connector, connector pin #, Pine64 FCT]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2, RXD, RED, 'EXP', 7, "UART0_TX/PB8_TX"]
+[3, TXD, BLU, 'EXP', 8, "PB8_RX"]
+[5, GND, GRN, 'EXP', 9, "GND"]
+
+
+Hop on the terminal and identify the UART device on your host machine
+
+$:  `dmesg | grep -i ucom`
+$:  `ls /dev/cuaU*`
+
+^^^the above step screwed up because i grabbed a random microUSB for charging
+my phones and it didn't enumerate when I did `usbconfig list`, changed the 
+cable and lo & behold it enumerated.
+
+
+0 fran.sys ~/code/lameOS > kldstat | egrep ' ucom| uftdi'
+18    1 0xffffffff832c4000     85e0 uftdi.ko
+19    1 0xffffffff832cd000     4e10 ucom.ko
+
+
+0 fran.sys ~/code/lameOS > ls -l /dev/cuaU* /dev/ttyU* 2>/dev/null
+crw-rw----  1 uucp dialer 0x18d Aug 10 13:59 /dev/cuaU0
+crw-rw----  1 uucp dialer 0x18e Aug 10 13:59 /dev/cuaU0.init
+crw-rw----  1 uucp dialer 0x18f Aug 10 13:59 /dev/cuaU0.lock
+crw-------  1 root wheel  0x18a Aug 10 13:59 /dev/ttyU0
+crw-------  1 root wheel  0x18b Aug 10 13:59 /dev/ttyU0.init
+crw-------  1 root wheel  0x18c Aug 10 13:59 /dev/ttyU0.lock
+
+
+##########################################################
+####                                                  ####
+####  Command to communicate over PmodUSBUART Device  ####
+####                                                  ####
+##########################################################
+
+sudo picocom -b 115200 --flow n --imap lfcrlf --omap crlf /dev/cuaU0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

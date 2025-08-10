@@ -1,0 +1,102 @@
+#####################################
+    Useful Disk-Related Commands
+#####################################
+
+
+0 fran.sys ~ > sudo camcontrol devlist
+<KINGSTON SNV2S250G SBJ01101>      at scbus6 target 0 lun 1 (pass0,nda0)
+<Generic- Multi-Card 1.00>         at scbus7 target 0 lun 0 (da0,pass1)
+
+
+0 fran.sys ~ > geom disk list
+Geom name: nda0
+Providers:
+1. Name: nda0
+   Mediasize: 250059350016 (233G)
+   Sectorsize: 512
+   Mode: r2w2e3
+   descr: KINGSTON SNV2S250G
+   lunid: 00000000000000000026b77851cf6645
+   ident: 50026B77851CF664
+   rotationrate: 0
+   fwsectors: 0
+   fwheads: 0
+
+Geom name: da0
+Providers:
+1. Name: da0
+   Mediasize: 15931539456 (15G)
+   Sectorsize: 512
+   Mode: r0w0e0
+   descr: Generic- Multi-Card
+   lunid: 00e04c2020202000
+   ident: 20120501030900000
+   rotationrate: unknown
+   fwsectors: 63
+   fwheads: 255
+
+0 fran.sys ~ > diskinfo /dev/da0
+/dev/da0	512	15931539456	31116288	0	0	1936	255	63
+
+
+### Also useful for seeing your USB stuff ###
+ 
+`usbconfig list`
+
+`dmesg`
+
+
+#######################
+        NOTE
+#######################
+
+Pine64 says the max size of a bootable SD card is 256GB
+(mine is 16GB...)
+
+
+
+#########################
+#   What the PKG Says   #
+#########################
+
+0 fran.sys ~ > cat /usr/local/share/u-boot/u-boot-pine64-lts/README
+U-Boot loader and related files for the Pine64-LTS.
+
+To install this bootloader on an sdcard just do:
+dd if=/usr/local/share/u-boot/u-boot-pine64-lts/u-boot-sunxi-with-spl.bin of=/path/to/sdcarddevice bs=128k seek=1 conv=sync
+
+For information about running FreeBSD on Allwinner boards, see
+ https://wiki.freebsd.org/FreeBSD/arm/Allwinner
+
+
+############################################################
+#                                                          #
+#   Steps GPT Says to Take to Get U-Boot SPL on There      #
+#        NOTE WELL: Specific to B$'s Machine!!!!!!         #
+#                                                          #
+############################################################
+
+# Install the board-specific U‑Boot
+sudo pkg install -y u-boot-pine64-lts
+
+# Sanity: confirm the image path exists
+pkg info -l u-boot-pine64-lts | grep 'u-boot-sunxi-with-spl.bin'
+
+# Make sure nothing is mounted from da0 (should be silent)
+mount | grep da0 || true
+sudo umount /dev/da0* 2>/dev/null || true
+
+
+#################################################################
+#                !!! NOTE EXTREMELY WELL !!!                    #
+# The `DD` command will smoke your SD card and other disks!!!!  #
+#                                                               #
+#################################################################
+
+# WRITE IT (DESTROYS the card)
+sudo dd if=/usr/local/share/u-boot/u-boot-pine64-lts/u-boot-sunxi-with-spl.bin \
+        of=/dev/da0 bs=128k seek=1 conv=sync
+sync
+
+
+
