@@ -1,0 +1,92 @@
+#################################
+##########  NOTE WELL  ##########  
+#################################
+
+I found that while the Cortex-A53 on the Pine64 "has JTAG", only 
+two of the four necessary lines are exposed to physical headers,
+the ones that are missing are PB0 and PB1, TMS & TCK. Seeing as 
+you can't run the JTAG state machine with no mode select line 
+and no clock line; JTAG can't feasibly be used for connecting to a 
+Pine64 :(. I heard from GPT and forums from 10 years ago
+(ca 2015-16) that some of the wizards at sunxi got a JTAG
+interface out of hacking their way into the SD card port, but
+that's beyond the scope of what I want to do for this project.
+
+Therefore: UART it is for bare-metal bring-up/monitoring.
+
+~B$ 8/10/2025
+
+
+JTAG Pins:
+
+-----------------------------
+TCK (Test Clock)            |
+[debugger -> target device] |
+-----------------------------
+Explanation:
+The "heartbeat" of the JTAG interface. Every bit shifted in/out occurs on the
+edges of this clock signal
+
+
+-----------------------------
+TMS (Test Mode Select)      |
+[debugger -> target device] |
+-----------------------------
+Explanation:
+Controls the JTAG state machine — tells the TAP controller whether to shift data,
+shift instructions, reset, etc.
+
+
+-----------------------------
+TDI (Test Data In)          |
+[debugger -> target device] |
+-----------------------------
+Explanation:
+The serial data line into the target’s JTAG scan chain. Used to send instructions/data
+to the chip
+
+
+-----------------------------
+TDO (Test Data Out)         |
+[target device -> debugger] |
+-----------------------------
+Explanation:
+The serial data line out of the target’s scan chain. Used to read status/data from
+the chip.
+
+
+
+########## Two more common "support" lines ########## 
+
+"GND" 
+    -> ground voltage reference shared between target & debugger
+
+"VTREF" or "Vtarget" 
+    -> let's the debugger (if equipped) to sense the target device's voltage level
+       which, on a Pine64 is 3.3VDC, so that it can drive pins to correct levels.
+       This is not a power source, merely a voltmeter kind of reference.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
