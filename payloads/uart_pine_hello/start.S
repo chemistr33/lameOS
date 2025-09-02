@@ -24,9 +24,6 @@ ___lameos___:
     // Set Execution Privilege Level to EL1
     msr     spsel, #1
 
-    // Record current EL for future use
-    msr     x9, CurrentEL /// bits[3:2] -> EL (e.g., 0x8 = EL2, 0x4 = EL1)
-    
     // Stack Pointer Setup (Uses Linker Symbol (constant addr))
     ldr     x0, =___STACKTOP___
     mov     sp, x0

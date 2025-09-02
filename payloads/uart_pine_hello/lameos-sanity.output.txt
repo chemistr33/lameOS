@@ -1,0 +1,92 @@
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF64
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           AArch64
+  Version:                           0x1
+  Entry point address:               0x42000000
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          67976 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         2
+  Size of section headers:           64 (bytes)
+  Number of section headers:         8
+  Section header string table index: 7
+
+Elf file type is EXEC (Executable file)
+Entry point 0x42000000
+There are 2 program headers, starting at offset 64
+
+Program Headers:
+  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align
+  LOAD           0x010000 0x0000000042000000 0x0000000042000000 0x000503 0x000503 R E 0x10000
+  LOAD           0x010510 0x0000000042000510 0x0000000042000510 0x000000 0x000000 RW  0x10000
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     .text 
+   01     .data .bss 
+0000000000000510 A ___image_size___
+0000000042000000 T ___image_start___
+0000000042000000 T ___lameos___
+0000000042000020 t zero_bss
+0000000042000030 t run_main
+0000000042000034 t hang_forever
+0000000042000060 T uart_hex64
+0000000042000110 t uart_puts
+0000000042000170 T main
+000000004200034c T get_current_el
+0000000042000510 B ___image_end___
+0000000042000510 B __bss_end
+0000000042000510 B __bss_start
+0000000042000510 D __data_end
+0000000042000510 D __data_start
+0000000044000000 A ___STACKTOP___
+   text	   data	    bss	    dec	    hex	filename
+   1283	      0	      0	   1283	    503	lameOS_UART.elf
+
+lameOS_UART.elf:     file format elf64-littleaarch64
+
+
+Disassembly of section .text:
+
+0000000042000000 <___lameos___>:
+___lameos___():
+    42000000:	d5034fdf 	msr	daifset, #0xf
+___image_start___():
+    42000004:	d50041bf 	msr	spsel, #0x1
+    42000008:	580001c0 	ldr	x0, 42000040 <hang_forever+0xc>
+    4200000c:	9100001f 	mov	sp, x0
+    42000010:	aa1f03fd 	mov	x29, xzr
+    42000014:	580001a1 	ldr	x1, 42000048 <hang_forever+0x14>
+    42000018:	580001c2 	ldr	x2, 42000050 <hang_forever+0x1c>
+    4200001c:	aa1f03e3 	mov	x3, xzr
+
+0000000042000020 <zero_bss>:
+zero_bss():
+    42000020:	eb02003f 	cmp	x1, x2
+    42000024:	54000062 	b.cs	42000030 <run_main>  // b.hs, b.nlast
+    42000028:	a8810c23 	stp	x3, x3, [x1], #16
+    4200002c:	17fffffd 	b	42000020 <zero_bss>
+
+0000000042000030 <run_main>:
+run_main():
+    42000030:	94000050 	bl	42000170 <main>
+
+0000000042000034 <hang_forever>:
+hang_forever():
+    42000034:	d503205f 	wfe
+    42000038:	17ffffff 	b	42000034 <hang_forever>
+    4200003c:	00000000 	udf	#0
+    42000040:	44000000 	.word	0x44000000
+    42000044:	00000000 	.word	0x00000000
+    42000048:	42000510 	.word	0x42000510
+    4200004c:	00000000 	.word	0x00000000
+    42000050:	42000510 	.word	0x42000510
+	...
