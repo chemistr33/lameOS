@@ -5,12 +5,12 @@
 .global ___lameos___
 .type   ___lameos___, %function
 
-// Externs from Linker Symbols
+// Externs provided by linker
 .extern __bss_start
 .extern __bss_end
 .extern ___STACKTOP___
 
-// Externs from C Runtime
+// Externs provided by C Runtime
 .extern main
 
 
@@ -21,28 +21,40 @@ ___lameos___:
     // Halt Interrupts
     msr     daifset, #0xf
 
+    // Set Execution Privilege Level to EL1
+    msr     spsel, #1
+
+    // Record current EL for future use
+    msr     x9, CurrentEL /// bits[3:2] -> EL (e.g., 0x8 = EL2, 0x4 = EL1)
+    
     // Stack Pointer Setup (Uses Linker Symbol (constant addr))
     ldr     x0, =___STACKTOP___
     mov     sp, x0
+    
+    // (Optional) establish a frame pointer for C backtraces
+    mov     x29, xzr
 
     // Zero-Out the .bss, 16B per fell swoop
     ldr     x1, =__bss_start
     ldr     x2, =__bss_end
     mov     x3, xzr
-
-1:
+    
+/**
+ * compare (x1-x2), set flags accordingly
+ * if x1 >= x2, branch to next label, 'run_main'
+ */
+zero_bss:
     cmp     x1, x2
-    b.hs    2f
+    b.hs    run_main
+    /* Store X3 to [X1], Store X3 to [X1+8], increment X1 by 16B */
     stp     x3, x3, [x1], #16
-    b       1b
+    b       zero_bss
 
-2:
-    // Jump to C
+run_main:
+    // Jump to C "Runtime"
     bl      main
 
 // If C returns, Hang
-3:
+hang_forever:
     wfe
-    b       3b
-
-
+    b       hang_forever       
